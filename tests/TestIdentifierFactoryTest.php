@@ -5,98 +5,29 @@ namespace webignition\BasilTestIdentifierFactory\Tests;
 
 use webignition\BasilModel\Identifier\ElementIdentifier;
 use webignition\BasilModel\Identifier\ElementIdentifierInterface;
-use webignition\BasilModel\Identifier\Identifier;
 use webignition\BasilModel\Identifier\IdentifierTypes;
-use webignition\BasilModel\Value\ObjectValue;
-use webignition\BasilModel\Value\ObjectValueInterface;
-use webignition\BasilModel\Value\ValueTypes;
+use webignition\BasilModel\Identifier\ReferenceIdentifierInterface;
+use webignition\BasilModel\Value\CssSelector;
+use webignition\BasilModel\Value\ElementExpressionInterface;
+use webignition\BasilModel\Value\PageElementReference;
+use webignition\BasilModel\Value\XpathExpression;
 use webignition\BasilTestIdentifierFactory\TestIdentifierFactory;
 
 class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider createCssElementIdentifierDataProvider
+     * @dataProvider createElementIdentifierDataProvider
      */
-    public function testCreateCssElementIdentifier(
-        string $selector,
+    public function testCreateElementIdentifier(
+        ElementExpressionInterface $elementExpression,
         ?int $position,
         ?string $name,
         ?ElementIdentifierInterface $parentIdentifier,
         string $expectedIdentifierString,
-        int $expectedPosition
+        ?int $expectedPosition
     ) {
-        $identifier = TestIdentifierFactory::createCssElementIdentifier($selector, $position, $name, $parentIdentifier);
-
-        $this->assertInstanceOf(ElementIdentifier::class, $identifier);
-        $this->assertEquals(IdentifierTypes::ELEMENT_SELECTOR, $identifier->getType());
-        $this->assertSame(ValueTypes::CSS_SELECTOR, $identifier->getValue()->getType());
-        $this->assertSame($expectedIdentifierString, (string) $identifier);
-        $this->assertSame($expectedPosition, $identifier->getPosition());
-        $this->assertSame($name, $identifier->getName());
-        $this->assertSame($parentIdentifier, $identifier->getParentIdentifier());
-    }
-
-    public function createCssElementIdentifierDataProvider(): array
-    {
-        $parentIdentifier = TestIdentifierFactory::createCssElementIdentifier('.parent', 1, 'parent');
-
-        return [
-            'selector' => [
-                'selector' => '.selector',
-                'position' => null,
-                'name' => null,
-                'parentIdentifier' => null,
-                'expectedIdentifierString' => '".selector"',
-                'expectedPosition' => 1,
-            ],
-            'selector, position=1' => [
-                'selector' => '.selector',
-                'position' => 1,
-                'name' => null,
-                'parentIdentifier' => null,
-                'expectedIdentifierString' => '".selector"',
-                'expectedPosition' => 1,
-            ],
-            'selector, position=2' => [
-                'selector' => '.selector',
-                'position' => 2,
-                'name' => null,
-                'parentIdentifier' => null,
-                'expectedIdentifierString' => '".selector":2',
-                'expectedPosition' => 2,
-            ],
-            'name' => [
-                'selector' => '.selector',
-                'position' => null,
-                'name' => 'identifier name',
-                'parentIdentifier' => null,
-                'expectedIdentifierString' => '".selector"',
-                'expectedPosition' => 1,
-            ],
-            'parent identifier' => [
-                'selector' => '.selector',
-                'position' => null,
-                'name' => null,
-                'parentIdentifier' => $parentIdentifier,
-                'expectedIdentifierString' => '"{{ parent }} .selector"',
-                'expectedPosition' => 1,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider createXpathElementIdentifierDataProvider
-     */
-    public function testCreateXpathElementIdentifier(
-        string $selector,
-        ?int $position,
-        ?string $name,
-        ?ElementIdentifierInterface $parentIdentifier,
-        string $expectedIdentifierString,
-        int $expectedPosition
-    ) {
-        $identifier = TestIdentifierFactory::createXpathElementIdentifier(
-            $selector,
+        $identifier = TestIdentifierFactory::createElementIdentifier(
+            $elementExpression,
             $position,
             $name,
             $parentIdentifier
@@ -104,57 +35,100 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(ElementIdentifier::class, $identifier);
         $this->assertEquals(IdentifierTypes::ELEMENT_SELECTOR, $identifier->getType());
-        $this->assertSame(ValueTypes::XPATH_EXPRESSION, $identifier->getValue()->getType());
         $this->assertSame($expectedIdentifierString, (string) $identifier);
         $this->assertSame($expectedPosition, $identifier->getPosition());
         $this->assertSame($name, $identifier->getName());
         $this->assertSame($parentIdentifier, $identifier->getParentIdentifier());
     }
 
-    public function createXpathElementIdentifierDataProvider(): array
+    public function createElementIdentifierDataProvider(): array
     {
-        $parentIdentifier = TestIdentifierFactory::createXpathElementIdentifier('//parent', 1, 'parent');
+        $parentIdentifier = TestIdentifierFactory::createElementIdentifier(
+            new CssSelector('.parent'),
+            1,
+            'parent'
+        );
 
         return [
-            'selector' => [
-                'selector' => '//h1',
+            'css selector, position=null' => [
+                'elementExpression' => new CssSelector('.selector'),
+                'position' => null,
+                'name' => null,
+                'parentIdentifier' => null,
+                'expectedIdentifierString' => '".selector"',
+                'expectedPosition' => null,
+            ],
+            'css selector, position=1' => [
+                'elementExpression' => new CssSelector('.selector'),
+                'position' => 1,
+                'name' => null,
+                'parentIdentifier' => null,
+                'expectedIdentifierString' => '".selector"',
+                'expectedPosition' => 1,
+            ],
+            'css selector, position=2' => [
+                'elementExpression' => new CssSelector('.selector'),
+                'position' => 2,
+                'name' => null,
+                'parentIdentifier' => null,
+                'expectedIdentifierString' => '".selector":2',
+                'expectedPosition' => 2,
+            ],
+            'css selector, name' => [
+                'elementExpression' => new CssSelector('.selector'),
+                'position' => null,
+                'name' => 'identifier name',
+                'parentIdentifier' => null,
+                'expectedIdentifierString' => '".selector"',
+                'expectedPosition' => null,
+            ],
+            'css selector, parent identifier' => [
+                'elementExpression' => new CssSelector('.selector'),
+                'position' => null,
+                'name' => null,
+                'parentIdentifier' => $parentIdentifier,
+                'expectedIdentifierString' => '"{{ parent }} .selector"',
+                'expectedPosition' => null,
+            ],
+            'xpath expression' => [
+                'elementExpression' => new XpathExpression('//h1'),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => null,
                 'expectedIdentifierString' => '"//h1"',
-                'expectedPosition' => 1,
+                'expectedPosition' => null,
             ],
-            'selector, position=1' => [
-                'selector' => '//h1',
+            'xpath expression, position=1' => [
+                'elementExpression' => new XpathExpression('//h1'),
                 'position' => 1,
                 'name' => null,
                 'parentIdentifier' => null,
                 'expectedIdentifierString' => '"//h1"',
                 'expectedPosition' => 1,
             ],
-            'selector, position=2' => [
-                'selector' => '//h1',
+            'xpath expression, position=2' => [
+                'elementExpression' => new XpathExpression('//h1'),
                 'position' => 2,
                 'name' => null,
                 'parentIdentifier' => null,
                 'expectedIdentifierString' => '"//h1":2',
                 'expectedPosition' => 2,
             ],
-            'name' => [
-                'selector' => '//h1',
+            'xpath expression, name' => [
+                'elementExpression' => new XpathExpression('//h1'),
                 'position' => null,
                 'name' => 'identifier name',
                 'parentIdentifier' => null,
                 'expectedIdentifierString' => '"//h1"',
-                'expectedPosition' => 1,
+                'expectedPosition' => null,
             ],
-            'parent identifier' => [
-                'selector' => '//h1',
+            'xpath expression, parent identifier' => [
+                'elementExpression' => new XpathExpression('//h1'),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => $parentIdentifier,
                 'expectedIdentifierString' => '"{{ parent }} //h1"',
-                'expectedPosition' => 1,
+                'expectedPosition' => null,
             ],
         ];
     }
@@ -163,13 +137,13 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
      * @dataProvider createPageElementReferenceIdentifierDataProvider
      */
     public function testCreatePageElementReferenceIdentifier(
-        ObjectValueInterface $objectValue,
+        PageElementReference $pageElementReference,
         ?string $name,
         string $expectedIdentifierString
     ) {
-        $identifier = TestIdentifierFactory::createPageElementReferenceIdentifier($objectValue, $name);
+        $identifier = TestIdentifierFactory::createPageElementReferenceIdentifier($pageElementReference, $name);
 
-        $this->assertInstanceOf(Identifier::class, $identifier);
+        $this->assertInstanceOf(ReferenceIdentifierInterface::class, $identifier);
         $this->assertEquals(IdentifierTypes::PAGE_ELEMENT_REFERENCE, $identifier->getType());
         $this->assertEquals($name, $identifier->getName());
         $this->assertSame($expectedIdentifierString, (string) $identifier);
@@ -177,8 +151,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function createPageElementReferenceIdentifierDataProvider(): array
     {
-        $objectValue = new ObjectValue(
-            ValueTypes::PAGE_ELEMENT_REFERENCE,
+        $pageElementReference = new PageElementReference(
             'page_import_name.elements.element_name',
             'page_import_name',
             'element_name'
@@ -186,12 +159,12 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
 
         return [
             'reference' => [
-                'objectValue' => $objectValue,
+                'pageElementReference' => $pageElementReference,
                 'name' => null,
                 'expectedIdentifierString' => 'page_import_name.elements.element_name',
             ],
             'reference, name' => [
-                'objectValue' => $objectValue,
+                'pageElementReference' => $pageElementReference,
                 'name' => 'name',
                 'expectedIdentifierString' => 'page_import_name.elements.element_name',
             ],

@@ -5,7 +5,6 @@ namespace webignition\BasilTestIdentifierFactory\Tests;
 
 use webignition\BasilModel\Identifier\ElementIdentifier;
 use webignition\BasilModel\Identifier\ElementIdentifierInterface;
-use webignition\BasilModel\Identifier\IdentifierTypes;
 use webignition\BasilModel\Identifier\ReferenceIdentifierInterface;
 use webignition\BasilModel\Value\CssSelector;
 use webignition\BasilModel\Value\ElementExpressionInterface;
@@ -34,7 +33,6 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertInstanceOf(ElementIdentifier::class, $identifier);
-        $this->assertEquals(IdentifierTypes::ELEMENT_SELECTOR, $identifier->getType());
         $this->assertSame($expectedIdentifierString, (string) $identifier);
         $this->assertSame($expectedPosition, $identifier->getPosition());
         $this->assertSame($name, $identifier->getName());
@@ -144,7 +142,6 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
         $identifier = TestIdentifierFactory::createPageElementReferenceIdentifier($pageElementReference, $name);
 
         $this->assertInstanceOf(ReferenceIdentifierInterface::class, $identifier);
-        $this->assertEquals(IdentifierTypes::PAGE_ELEMENT_REFERENCE, $identifier->getType());
         $this->assertEquals($name, $identifier->getName());
         $this->assertSame($expectedIdentifierString, (string) $identifier);
     }

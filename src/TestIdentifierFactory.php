@@ -5,7 +5,6 @@ namespace webignition\BasilTestIdentifierFactory;
 use webignition\BasilModel\Identifier\ElementIdentifier;
 use webignition\BasilModel\Identifier\ElementIdentifierInterface;
 use webignition\BasilModel\Identifier\IdentifierInterface;
-use webignition\BasilModel\Identifier\IdentifierTypes;
 use webignition\BasilModel\Identifier\ReferenceIdentifier;
 use webignition\BasilModel\Value\ElementExpressionInterface;
 use webignition\BasilModel\Value\PageElementReference;
@@ -40,8 +39,7 @@ class TestIdentifierFactory
         PageElementReference $pageElementReference,
         ?string $name = null
     ): IdentifierInterface {
-        $identifier = new ReferenceIdentifier(
-            IdentifierTypes::PAGE_ELEMENT_REFERENCE,
+        $identifier = ReferenceIdentifier::createPageElementReferenceIdentifier(
             $pageElementReference
         );
 

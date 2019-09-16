@@ -3,13 +3,12 @@
 
 namespace webignition\BasilTestIdentifierFactory\Tests;
 
-use webignition\BasilModel\Identifier\ElementIdentifier;
-use webignition\BasilModel\Identifier\ElementIdentifierInterface;
+use webignition\BasilModel\Identifier\DomIdentifierInterface;
 use webignition\BasilModel\Identifier\ReferenceIdentifierInterface;
-use webignition\BasilModel\Value\CssSelector;
+use webignition\BasilModel\Value\ElementExpression;
 use webignition\BasilModel\Value\ElementExpressionInterface;
+use webignition\BasilModel\Value\ElementExpressionType;
 use webignition\BasilModel\Value\PageElementReference;
-use webignition\BasilModel\Value\XpathExpression;
 use webignition\BasilTestIdentifierFactory\TestIdentifierFactory;
 
 class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
@@ -21,7 +20,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
         ElementExpressionInterface $elementExpression,
         ?int $position,
         ?string $name,
-        ?ElementIdentifierInterface $parentIdentifier,
+        ?DomIdentifierInterface $parentIdentifier,
         string $expectedIdentifierString,
         ?int $expectedPosition
     ) {
@@ -32,7 +31,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
             $parentIdentifier
         );
 
-        $this->assertInstanceOf(ElementIdentifier::class, $identifier);
+        $this->assertInstanceOf(DomIdentifierInterface::class, $identifier);
         $this->assertSame($expectedIdentifierString, (string) $identifier);
         $this->assertSame($expectedPosition, $identifier->getPosition());
         $this->assertSame($name, $identifier->getName());
@@ -42,14 +41,14 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
     public function createElementIdentifierDataProvider(): array
     {
         $parentIdentifier = TestIdentifierFactory::createElementIdentifier(
-            new CssSelector('.parent'),
+            new ElementExpression('.parent', ElementExpressionType::CSS_SELECTOR),
             1,
             'parent'
         );
 
         return [
             'css selector, position=null' => [
-                'elementExpression' => new CssSelector('.selector'),
+                'elementExpression' => new ElementExpression('.selector', ElementExpressionType::CSS_SELECTOR),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -57,7 +56,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => null,
             ],
             'css selector, position=1' => [
-                'elementExpression' => new CssSelector('.selector'),
+                'elementExpression' => new ElementExpression('.selector', ElementExpressionType::CSS_SELECTOR),
                 'position' => 1,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -65,7 +64,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => 1,
             ],
             'css selector, position=2' => [
-                'elementExpression' => new CssSelector('.selector'),
+                'elementExpression' => new ElementExpression('.selector', ElementExpressionType::CSS_SELECTOR),
                 'position' => 2,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -73,7 +72,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => 2,
             ],
             'css selector, name' => [
-                'elementExpression' => new CssSelector('.selector'),
+                'elementExpression' => new ElementExpression('.selector', ElementExpressionType::CSS_SELECTOR),
                 'position' => null,
                 'name' => 'identifier name',
                 'parentIdentifier' => null,
@@ -81,7 +80,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => null,
             ],
             'css selector, parent identifier' => [
-                'elementExpression' => new CssSelector('.selector'),
+                'elementExpression' => new ElementExpression('.selector', ElementExpressionType::CSS_SELECTOR),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => $parentIdentifier,
@@ -89,7 +88,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => null,
             ],
             'xpath expression' => [
-                'elementExpression' => new XpathExpression('//h1'),
+                'elementExpression' => new ElementExpression('//h1', ElementExpressionType::XPATH_EXPRESSION),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -97,7 +96,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => null,
             ],
             'xpath expression, position=1' => [
-                'elementExpression' => new XpathExpression('//h1'),
+                'elementExpression' => new ElementExpression('//h1', ElementExpressionType::XPATH_EXPRESSION),
                 'position' => 1,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -105,7 +104,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => 1,
             ],
             'xpath expression, position=2' => [
-                'elementExpression' => new XpathExpression('//h1'),
+                'elementExpression' => new ElementExpression('//h1', ElementExpressionType::XPATH_EXPRESSION),
                 'position' => 2,
                 'name' => null,
                 'parentIdentifier' => null,
@@ -113,7 +112,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => 2,
             ],
             'xpath expression, name' => [
-                'elementExpression' => new XpathExpression('//h1'),
+                'elementExpression' => new ElementExpression('//h1', ElementExpressionType::XPATH_EXPRESSION),
                 'position' => null,
                 'name' => 'identifier name',
                 'parentIdentifier' => null,
@@ -121,7 +120,7 @@ class TestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedPosition' => null,
             ],
             'xpath expression, parent identifier' => [
-                'elementExpression' => new XpathExpression('//h1'),
+                'elementExpression' => new ElementExpression('//h1', ElementExpressionType::XPATH_EXPRESSION),
                 'position' => null,
                 'name' => null,
                 'parentIdentifier' => $parentIdentifier,

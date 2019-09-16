@@ -2,10 +2,10 @@
 
 namespace webignition\BasilTestIdentifierFactory;
 
-use webignition\BasilModel\Identifier\ElementIdentifier;
-use webignition\BasilModel\Identifier\ElementIdentifierInterface;
-use webignition\BasilModel\Identifier\IdentifierInterface;
+use webignition\BasilModel\Identifier\DomIdentifier;
+use webignition\BasilModel\Identifier\DomIdentifierInterface;
 use webignition\BasilModel\Identifier\ReferenceIdentifier;
+use webignition\BasilModel\Identifier\ReferenceIdentifierInterface;
 use webignition\BasilModel\Value\ElementExpressionInterface;
 use webignition\BasilModel\Value\PageElementReference;
 
@@ -15,20 +15,23 @@ class TestIdentifierFactory
         ElementExpressionInterface $elementExpression,
         int $position = null,
         ?string $name = null,
-        ?ElementIdentifierInterface $parentIdentifier = null
-    ): ElementIdentifierInterface {
-        $identifier = new ElementIdentifier($elementExpression, $position);
+        ?DomIdentifierInterface $parentIdentifier = null
+    ): DomIdentifierInterface {
+        $identifier = new DomIdentifier($elementExpression);
+
+        if (null !== $position) {
+            $identifier = $identifier->withPosition($position);
+        }
 
         if (null !== $name) {
             $identifier = $identifier->withName($name);
         }
 
-        if ($identifier instanceof ElementIdentifierInterface &&
-            $parentIdentifier instanceof ElementIdentifierInterface) {
+        if ($identifier instanceof DomIdentifierInterface && $parentIdentifier instanceof DomIdentifierInterface) {
             $identifier = $identifier->withParentIdentifier($parentIdentifier);
         }
 
-        if ($identifier instanceof ElementIdentifierInterface) {
+        if ($identifier instanceof DomIdentifierInterface) {
             return $identifier;
         }
 
@@ -38,7 +41,7 @@ class TestIdentifierFactory
     public static function createPageElementReferenceIdentifier(
         PageElementReference $pageElementReference,
         ?string $name = null
-    ): IdentifierInterface {
+    ): ReferenceIdentifierInterface {
         $identifier = ReferenceIdentifier::createPageElementReferenceIdentifier(
             $pageElementReference
         );
@@ -47,7 +50,7 @@ class TestIdentifierFactory
             $identifier = $identifier->withName($name);
         }
 
-        if ($identifier instanceof IdentifierInterface) {
+        if ($identifier instanceof ReferenceIdentifierInterface) {
             return $identifier;
         }
 

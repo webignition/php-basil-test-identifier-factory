@@ -6,21 +6,20 @@ use webignition\BasilModel\Identifier\DomIdentifier;
 use webignition\BasilModel\Identifier\DomIdentifierInterface;
 use webignition\BasilModel\Identifier\ReferenceIdentifier;
 use webignition\BasilModel\Identifier\ReferenceIdentifierInterface;
-use webignition\BasilModel\Value\ElementExpressionInterface;
 use webignition\BasilModel\Value\PageElementReference;
 
 class TestIdentifierFactory
 {
     public static function createElementIdentifier(
-        ElementExpressionInterface $elementExpression,
+        string $locator,
         int $position = null,
         ?string $name = null,
         ?DomIdentifierInterface $parentIdentifier = null
     ): DomIdentifierInterface {
-        $identifier = new DomIdentifier($elementExpression);
+        $identifier = new DomIdentifier($locator);
 
         if (null !== $position) {
-            $identifier = $identifier->withPosition($position);
+            $identifier = $identifier->withOrdinalPosition($position);
         }
 
         if (null !== $name) {

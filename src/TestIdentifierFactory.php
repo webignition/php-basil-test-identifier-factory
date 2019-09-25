@@ -12,15 +12,11 @@ class TestIdentifierFactory
 {
     public static function createElementIdentifier(
         string $locator,
-        int $position = null,
+        int $ordinalPosition = null,
         ?string $name = null,
         ?DomIdentifierInterface $parentIdentifier = null
     ): DomIdentifierInterface {
-        $identifier = new DomIdentifier($locator);
-
-        if (null !== $position) {
-            $identifier = $identifier->withOrdinalPosition($position);
-        }
+        $identifier = new DomIdentifier($locator, $ordinalPosition);
 
         if (null !== $name) {
             $identifier = $identifier->withName($name);
